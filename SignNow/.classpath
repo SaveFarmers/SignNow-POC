@@ -13,68 +13,15 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="/Users/sivakumar/.m2/repository/org/springframework/spring-core/4.3.6.RELEASE/spring-core-4.3.6.RELEASE.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="spring-core-4.3.6.RELEASE.jar"/>
-			<attribute name="maven.groupId" value="org.springframework"/>
-			<attribute name="maven.artifactId" value="spring-core"/>
-			<attribute name="maven.version" value="4.3.6.RELEASE"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/.m2/repository/org/springframework/spring-context/4.3.6.RELEASE/spring-context-4.3.6.RELEASE.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="spring-context-4.3.6.RELEASE.jar"/>
-			<attribute name="maven.groupId" value="org.springframework"/>
-			<attribute name="maven.artifactId" value="spring-context"/>
-			<attribute name="maven.version" value="4.3.6.RELEASE"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/.m2/repository/com/google/code/gson/gson/1.4/gson-1.4.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="gson-1.4.jar"/>
-			<attribute name="maven.groupId" value="com.google.code.gson"/>
-			<attribute name="maven.artifactId" value="gson"/>
-			<attribute name="maven.version" value="1.4"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/jar_files/json-simple-1.1.1.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="json-simple-1.1.jar"/>
-			<attribute name="maven.groupId" value="com.googlecode.json-simple"/>
-			<attribute name="maven.artifactId" value="json-simple"/>
-			<attribute name="maven.version" value="1.1"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/jar_files/hamcrest-core-1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/jar_files/junit-4.10.jar"/>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/htmlunit-2.19/lib/httpcore-4.4.3.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="httpcore-4.4.jar"/>
-			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
-			<attribute name="maven.artifactId" value="httpcore"/>
-			<attribute name="maven.version" value="4.4"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/htmlunit-2.19/lib/httpclient-4.5.1.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="httpclient-4.4.jar"/>
-			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
-			<attribute name="maven.artifactId" value="httpclient"/>
-			<attribute name="maven.version" value="4.4"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/sivakumar/Downloads/htmlunit-2.19/lib/httpmime-4.5.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/gson-1.4.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/hamcrest-core-1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/httpclient-4.5.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/httpcore-4.4.3.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/httpmime-4.5.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/javax.servlet-3.0.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/spring-context-4.3.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/Users/sivakumar/work/SignNow-POC/SignNow/WebContent/WEB-INF/lib/spring-core-4.3.6.RELEASE.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
