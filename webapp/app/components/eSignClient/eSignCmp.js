@@ -13,7 +13,8 @@ myApp.component('eSignCmp', {
       },
       allDocuments: [],
       currentDocument: {},
-      recipients: []
+      recipients: [],
+      loggedIn: false
     });
 
     ctrl.$onInit = function() {
@@ -34,6 +35,8 @@ myApp.component('eSignCmp', {
         console.log(response);
         $localStorage.cre = response;
         $localStorage.email = ctrl.user.email;
+        ctrl.loggedIn = true;
+        ctrl.getAllDocuments();
       });
     };
 

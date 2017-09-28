@@ -58,7 +58,7 @@ myApp.directive('authenticatedSrc', ['APIService', function (APIService) {
       var reader = new window.FileReader();
       reader.readAsDataURL(response.data);
       reader.onloadend = function() {
-        attrs.$set('src', reader.result);
+        attrs.$set('data', reader.result);
       };
     });
   }
