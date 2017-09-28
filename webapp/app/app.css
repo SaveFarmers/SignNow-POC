@@ -1,0 +1,80 @@
+/* app css stylesheet */
+
+.menu {
+  list-style: none;
+  border-bottom: 0.1em solid black;
+  margin-bottom: 2em;
+  padding: 0 0 0.5em;
+}
+
+.menu:before {
+  content: "[";
+}
+
+.menu:after {
+  content: "]";
+}
+
+.menu > li {
+  display: inline;
+}
+
+.menu > li + li:before {
+  content: "|";
+  padding-right: 0.3em;
+}
+
+a.lined {
+  cursor: pointer;
+  color: #0044cc;
+  border-bottom: 1px solid #0044cc;
+}
+
+a.link {
+  cursor: pointer;
+  color: #0044cc;
+}
+
+
+
+table {
+  border-collapse: collapse;
+  font-feature-settings: "kern", "liga", "tnum";
+  margin: 10px 0;
+  table-layout: fixed;
+  width: 100%;
+  border: 1px solid #D3DCE0;
+}
+
+th {
+  font-size: 15px;
+  font-weight: 600;
+  color: #252D37;
+}
+th.sortable {
+  cursor: pointer;
+}
+
+td, th {
+  border-bottom: 1px solid #D3DCE0;
+  padding: 10px;
+  text-align: left;
+}
+td.center, th.center {
+  text-align: center;
+}
+td.right, th.right {
+  text-align: right;
+}
+td:first-child, th:first-child {
+  border-left: none;
+}
+table tr:hover td, table .active td {
+  background: #f2f5f7;
+}
+table tr.nestedTable:hover td {
+  background: #fff !important;
+}
+table tr.nestedTable tr:hover td {
+  background: #f2f5f7 !important;
+}
