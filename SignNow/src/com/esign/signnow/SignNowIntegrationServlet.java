@@ -176,7 +176,9 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					
 					
 				case "THUMBNAILS":
-					String requestUrl = request.getParameter("requestUrl");
+//					String requestUrl = request.getParameter("requestUrl");
+					obj = (JSONObject) parser.parse(request.getReader());
+					String requestUrl = (String) obj.get("requestUrl");
 					processGetPNGRequest(requestUrl, request, response);
 					break;
 					

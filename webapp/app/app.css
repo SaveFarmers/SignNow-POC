@@ -35,7 +35,15 @@ a.link {
   color: #0044cc;
 }
 
+a.link.active {
+  color: maroon;
+  border-bottom: 1px solid maroon;
+}
 
+a.link-icon {
+  cursor: pointer;
+  color: #0044cc;
+}
 
 table {
   border-collapse: collapse;

@@ -2,7 +2,7 @@ myApp.component('eSignCmp', {
   templateUrl: 'components/eSignClient/eSignCmp.html',
   controllerAs: 'ctrl',
   /* @ngInject */ //This is for Inline Array Annotation for Dependency Injection
-  controller: function (APIService, $localStorage, upload, $q, $http) {
+  controller: function (APIService, $localStorage, upload, $q, $http, $filter) {
 
     var ctrl = this;
 
@@ -12,7 +12,7 @@ myApp.component('eSignCmp', {
         password: ''
       },
       allDocuments: [],
-      currentDocument: {},
+      currentDocument: undefined,
       recipients: [],
       loggedIn: false
     });
@@ -63,7 +63,13 @@ myApp.component('eSignCmp', {
     ctrl.getAllDocuments = function() {
 
       APIService.eSign.getAllDocuments({request: 'GET_ALL_DOCUMENTS'}).$promise.then(function(response) {
+        if (response && response.length > 0) {
+          response = $filter('orderBy')(response, 'original_filename');
+        }
         ctrl.allDocuments = response;
+        if (!ctrl.currentDocument) {
+          ctrl.getDocument(ctrl.allDocuments[0]);
+        }
         for (var i = 0; i<ctrl.allDocuments.length; i++) {
           var obj = ctrl.allDocuments[i];
           setImage(obj);
@@ -78,9 +84,18 @@ myApp.component('eSignCmp', {
       });
     }
 
+    ctrl.loadCurrentPage = function(page, pageIndex) {
+      ctrl.getThumbnails(page.src).then(function(response) {
+        ctrl.currentPage = page;
+        ctrl.currentPage.receivedImage = response;
+        ctrl.currentPage.pageIndex = pageIndex;
+      });
+    }
     ctrl.getDocument = function(doc) {
       APIService.eSign.getDocument({request: 'GET_DOCUMENT', documentId: doc.id}).$promise.then(function(response) {
         ctrl.currentDocument = response;
+        ctrl.showDocument = true;
+        ctrl.loadCurrentPage(ctrl.currentDocument.pages[0]);
       });
     };
 
@@ -220,13 +235,12 @@ myApp.component('eSignCmp', {
 
     ctrl.getThumbnails = function(url) {
       var deferred = $q.defer();
-      $http(
-          {
+      $http({
             method: 'POST',
             url: 'http://localhost:8080/SignNow/eSign?request=THUMBNAILS&requestUrl=' + url,
-            responseType: 'arraybuffer'
-    }
-    ).then(
+            responseType: 'arraybuffer',
+            data: {requestUrl: url}
+      }).then(
           function successCallback(response) {
             var image = 'data:image/png;base64,'+_arrayBufferToBase64(response.data);
             // return image;
