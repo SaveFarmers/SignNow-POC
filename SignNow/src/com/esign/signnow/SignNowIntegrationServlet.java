@@ -1,6 +1,8 @@
 package com.esign.signnow;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * Servlet implementation class SignNowIntegrationServlet
@@ -74,6 +77,16 @@ public class SignNowIntegrationServlet extends HttpServlet {
 		
 		doPost(request, response);
 	}
+	
+	/**
+	 * @see HttpServlet#doPut(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPut(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		doPost(request, response);
+	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -87,7 +100,7 @@ public class SignNowIntegrationServlet extends HttpServlet {
 			JSONObject resObj = null;
 			String resValue = null;
 			response.setContentType("application/json");
-			PrintWriter out = response.getWriter();
+			PrintWriter out = null;
 			String documentId = null;
 			String url = null;
 
@@ -104,11 +117,13 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					String password = (String) dataObj.get("password");
 					resValue = getOAuthToken(username, password);
 					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
 					out.print(resObj);
 
 					break;
 
 				case "FILE_UPLOAD":
+					
 					processFileUpload(request, response);
 				    break;
 				    
@@ -116,12 +131,14 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					documentId = request.getParameter("documentId");
 					resValue = processGetRequest(eSignBaseUrl + "/document/" + documentId, request);
 					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
 					out.print(resObj);
 					break;
 					
 				case "GET_ALL_DOCUMENTS":
 					resValue = processGetRequest(eSignBaseUrl + "/user/documentsv2", request);
 					JSONArray jsonArray = (JSONArray) parser.parse(resValue);
+					out = response.getWriter();
 					out.print(jsonArray);
 					break;
 					
@@ -130,6 +147,17 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					url = eSignBaseUrl + "/document/" + documentId;
 					resValue = processPostPutRequest(HTTP_METHOD_DELETE, url, null, AUTHENTICATION_METHOD_OAUTH, request);
 					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
+					out.print(resObj);
+					break;
+					
+				case "UPDATE_DOCUMENT":
+					documentId = request.getParameter("documentId");
+					url = eSignBaseUrl + "/document/" + documentId;
+					obj = (JSONObject) parser.parse(request.getReader());
+					resValue = processPostPutRequest(HTTP_METHOD_PUT, url, obj.toString(), AUTHENTICATION_METHOD_OAUTH, request);
+					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
 					out.print(resObj);
 					break;
 					
@@ -142,17 +170,14 @@ public class SignNowIntegrationServlet extends HttpServlet {
 
 					resValue = processPostPutRequest(HTTP_METHOD_POST, url, involvedParties.toString(), AUTHENTICATION_METHOD_OAUTH, request);
 					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
 					out.print(resObj);
 					break;
 					
 					
 				case "THUMBNAILS":
-//					obj = (JSONObject) parser.parse(request.getReader());
-//					String requestUrl = (String) obj.get("requestUrl");
 					String requestUrl = request.getParameter("requestUrl");
-					resValue = processGetRequest(requestUrl, request);
-//					resObj = (JSONObject) parser.parse(resValue);
-					out.print(resValue);
+					processGetPNGRequest(requestUrl, request, response);
 					break;
 					
 				default:
@@ -194,6 +219,11 @@ public class SignNowIntegrationServlet extends HttpServlet {
 		}
 
 	    try {
+	    	final Part dataPart = request.getPart("data");
+	    	String inputData = null;
+	    	if (dataPart != null) {
+	    		inputData = getValue(dataPart);
+	    	}
 			final Part filePart = request.getPart("file");
 		    final String fileName = getFileName(filePart);
 
@@ -208,11 +238,15 @@ public class SignNowIntegrationServlet extends HttpServlet {
 	        	System.out.println("read : " + read);
 	            out.write(bytes, 0, read);
 	        }
-	        writer.println("New file " + fileName + " created at " + path);
+//	        writer.println("New file " + fileName + " created at " + path);
 	        System.out.println("File{0}being uploaded to {1}" +
 	                new Object[]{fileName, path});
 	        
-	        uploadFile(eSignBaseUrl + "/document", authInfo, path + File.separator + fileName);
+	        if (uploadFile(eSignBaseUrl + "/document", authInfo, path + File.separator + fileName, inputData)) {
+	        	JSONObject res = new JSONObject();
+	        	res.put("status", "success");
+	        	writer.println(res.toString());
+	        };
 	    } catch (FileNotFoundException fne) {
 	        writer.println("You either did not specify a file to upload or are "
 	                + "trying to upload a file to a protected or nonexistent "
@@ -249,6 +283,124 @@ public class SignNowIntegrationServlet extends HttpServlet {
 	        }
 	    }
 	}
+	
+	 /**
+     * Returns the text value of the given part.
+     */
+    private String getValue(Part part) throws IOException {
+        BufferedReader reader = 
+            new BufferedReader(new InputStreamReader(part.getInputStream(), charset));
+        StringBuilder value = new StringBuilder();
+        char[] buffer = new char[10240];
+        for (int length = 0; (length = reader.read(buffer)) > 0;) {
+            value.append(buffer, 0, length);
+        }
+        return value.toString();
+    }
+    
+/*	private void processMultiPart(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			for (Part part : request.getParts()) {
+			    String filename = getFilename(part);
+			    if (filename == null) {
+			        processTextPart(part);
+			    } else if (!filename.isEmpty()) {
+			        processFilePart(part, filename);
+			    }
+			}
+		} catch (IOException | ServletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	*//**
+     * Returns the filename from the content-disposition header of the given part.
+     *//*
+    private String getFilename(Part part) {
+        for (String cd : part.getHeader("content-disposition").split(";")) {
+            if (cd.trim().startsWith("filename")) {
+                return cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
+    }
+
+    *//**
+     * Returns the text value of the given part.
+     *//*
+    private String getValue(Part part) throws IOException {
+        BufferedReader reader = 
+            new BufferedReader(new InputStreamReader(part.getInputStream(), "UTF-8"));
+        StringBuilder value = new StringBuilder();
+        char[] buffer = new char[10240];
+        for (int length = 0; (length = reader.read(buffer)) > 0;) {
+            value.append(buffer, 0, length);
+        }
+        return value.toString();
+    }
+
+    *//**
+     * Process given part as Text part.
+     *//*
+    private void processTextPart(Part part) throws IOException {
+        String name = part.getName();
+        String[] values = (String[]) super.get(name);
+
+        if (values == null) {
+            // Not in parameter map yet, so add as new value.
+            put(name, new String[] { getValue(part) });
+        } else {
+            // Multiple field values, so add new value to existing array.
+            int length = values.length;
+            String[] newValues = new String[length + 1];
+            System.arraycopy(values, 0, newValues, 0, length);
+            newValues[length] = getValue(part);
+            put(name, newValues);
+        }
+    }
+
+    *//**
+     * Process given part as File part which is to be saved in temp dir with the given filename.
+     *//*
+    private void processFilePart(Part part, String filename) throws IOException {
+        // First fix stupid MSIE behaviour (it passes full client side path along filename).
+        filename = filename
+            .substring(filename.lastIndexOf('/') + 1)
+            .substring(filename.lastIndexOf('\\') + 1);
+
+        // Get filename prefix (actual name) and suffix (extension).
+        String prefix = filename;
+        String suffix = "";
+        if (filename.contains(".")) {
+            prefix = filename.substring(0, filename.lastIndexOf('.'));
+            suffix = filename.substring(filename.lastIndexOf('.'));
+        }
+
+        // Write uploaded file.
+        File file = File.createTempFile(prefix + "_", suffix, new File(location));
+        if (multipartConfigured) {
+            part.write(file.getName()); // Will be written to the very same File.
+        } else {
+            InputStream input = null;
+            OutputStream output = null;
+            try {
+                input = new BufferedInputStream(part.getInputStream(), DEFAULT_BUFFER_SIZE);
+                output = new BufferedOutputStream(new FileOutputStream(file), DEFAULT_BUFFER_SIZE);
+                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                for (int length = 0; ((length = input.read(buffer)) > 0);) {
+                    output.write(buffer, 0, length);
+                }
+            } finally {
+                if (output != null) try { output.close(); } catch (IOException logOrIgnore) {  }
+                if (input != null) try { input.close(); } catch (IOException logOrIgnore) {  }
+            }
+        }
+
+        put(part.getName(), file);
+        part.delete(); // Cleanup temporary storage.
+    }*/
+
 
 	private void createUser(String data, HttpServletRequest request) {
 
@@ -364,6 +516,37 @@ public class SignNowIntegrationServlet extends HttpServlet {
 		return responseJSON;
 	}
 
+	private void processGetPNGRequest(String urlString, HttpServletRequest request, HttpServletResponse response) {
+		try {
+
+			URL url = new URL(java.net.URLDecoder.decode(urlString, "UTF-8"));
+			String authInfo = request.getHeader("Authorization");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", "image/png");
+			conn.setRequestProperty("Authorization", authInfo);
+
+			if (conn.getResponseCode() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+
+			BufferedInputStream in = new BufferedInputStream(conn.getInputStream());
+
+		    FileCopyUtils.copy(in, response.getOutputStream());
+		    conn.disconnect();
+		    response.flushBuffer();
+
+		} catch (MalformedURLException e) {
+
+			e.printStackTrace();
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		}
+	}
+	
 	/***
 	 * createApplication
 	 *
@@ -447,12 +630,8 @@ public class SignNowIntegrationServlet extends HttpServlet {
 		}
 		return responseJSON;
 	}
-
-	private void uploadDocument(String url, String authinfo, String file) {
-		
-	}
 	
-	private void uploadFile(String url, String authInfo, String file) {
+	private boolean uploadFile(String url, String authInfo, String file, String input) {
 		 CloseableHttpClient httpclient = HttpClients.createDefault();
 	        try {
 	            HttpPost httppost = new HttpPost(url);
@@ -460,15 +639,24 @@ public class SignNowIntegrationServlet extends HttpServlet {
 	            FileBody bin = new FileBody(new File(file));
 //	            StringBody comment = new StringBody("A binary file of some kind", ContentType.TEXT_PLAIN);
 
-	            HttpEntity reqEntity = MultipartEntityBuilder.create()
-	                    .addPart("file", bin)
-//	                    .addPart("comment", comment)
-	                    .build();
+	            HttpEntity reqEntity = null;
+	            
+	            if (input != null) {
+	            	reqEntity = MultipartEntityBuilder.create()
+		                    .addPart("file", bin)
+		                    .addTextBody("data", input)
+		                    .build();
+	            } else {
+	            	reqEntity = MultipartEntityBuilder.create()
+		                    .addPart("file", bin)
+		                    .build();
+	            }
 
 	            System.out.println("Auth Info : " + authInfo);
 
 	            httppost.setEntity(reqEntity);
 	            httppost.setHeader("Authorization", authInfo);
+	            
 
 	            System.out.println("executing request " + httppost.getRequestLine());
 	            CloseableHttpResponse response = httpclient.execute(httppost);
@@ -478,6 +666,7 @@ public class SignNowIntegrationServlet extends HttpServlet {
  	                HttpEntity resEntity = response.getEntity();
 	                if (resEntity != null) {
 	                    System.out.println("Response content length: " + resEntity.getContentLength());
+	                    return true;
 	                }
 	                EntityUtils.consume(resEntity);
 	            } finally {
@@ -495,6 +684,7 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					e.printStackTrace();
 				}
 	        }
+	        return false;
 	}
 	
 	private String readResponseAsJson(BufferedReader br) {
@@ -517,6 +707,8 @@ public class SignNowIntegrationServlet extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			System.out.println(response);
 
 			responseJSON = response.toString();
 		}

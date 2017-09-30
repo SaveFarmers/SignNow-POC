@@ -55,11 +55,20 @@ myApp.directive('authenticatedSrc', ['APIService', function (APIService) {
       responseType: 'blob'
     };
     APIService.eSign.thumbnails({request: 'THUMBNAILS', requestUrl: attrs.authenticatedSrc}, {requestUrl: attrs.authenticatedSrc}).$promise.then(function(response) {
-      var reader = new window.FileReader();
+/*      var reader = new window.FileReader();
       reader.readAsDataURL(response.data);
       reader.onloadend = function() {
         attrs.$set('data', reader.result);
-      };
+      };*/
+
+      // var img = document.createElement('img');
+      attrs.$set('src', 'data:image/jpeg;base64,' + hexToBase64(response));
+      // document.body.appendChild(img);
+
     });
+
+    function hexToBase64(str) {
+      return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
+    }
   }
 }]);

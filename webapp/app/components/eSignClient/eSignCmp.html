@@ -32,22 +32,23 @@
       <div width="60%">
         <table >
           <thead>
-          <!--<th width="25%">ID</th>-->
-          <th width="25%">original_filename</th>
+          <th width="25%">File</th>
           <th width="25%">owner</th>
-          <th width="25%"># of requests</th>
-          <th width="10%">thumbnail</th>
-          <th width="25%">Actions</th>
+          <th width="10%"># of requests</th>
+          <th width="25%">thumbnail</th>
+          <th width="15%">Actions</th>
           </thead>
           <tr ng-repeat="doc in ctrl.allDocuments | orderBy: 'original_filename'">
-            <!--<td><a class="lined" ng-click="ctrl.getDocument(doc)">{{doc.id}}</a></td>-->
             <td><a class="lined" ng-click="ctrl.getDocument(doc)">{{doc.original_filename}}</a></td>
             <td>{{doc.owner}}</td>
             <td>{{doc.requests ? doc.requests.length : 'N/A'}}</td>
-            <td><img style="width: 25px; height: 25px;" authenticated-src="{{doc.image}}"></td>
+            <td><img width="100" height="100" ng-src="{{doc.receivedImage}}"></td>
+
             <td>
               <a class="link" style="padding: 5px;" ng-click="ctrl.deleteDocument(doc)"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
-              <a class="link" ng-click="doc.collectRecipientInfo = true;"><i class="fa fa-share-square-o fa-lg" aria-hidden="true"></i></a>
+              <a class="link" style="padding: 5px;" ng-click="ctrl.updateDocument(doc)"><i class="fa fa-pencil-square fa-lg"></i></a>
+              <a  class="link" style="padding: 5px;" ng-click="ctrl.getDocument(doc)"><i class="fa fa-eye" aria-hidden="true"></i></a>
+              <a  class="link" ng-click="doc.collectRecipientInfo = true;"><i class="fa fa-share-square-o fa-lg" aria-hidden="true"></i></a>
               <span ng-if="doc.collectRecipientInfo">
                 <input type="text" placeholder="Recipient Email" ng-model="ctrl.recipient">
                 <input type="button" value="Send Invite" ng-click="ctrl.sendInvite(doc, ctrl.recipient)">
@@ -60,6 +61,9 @@
       <div width="40%">
 
       </div>
+    </div>
+    <div>
+
     </div>
   </div>
 </div>

@@ -36,13 +36,21 @@ myApp.factory('APIService', function($resource) {
         }
       },
 
+      updateDocument: {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      },
+
       thumbnails: {
         method: 'POST',
         headers: {
-          'Content-Type': 'arraybuffer',
-          'Accept': 'application/json'
+          'Content-Type': 'arraybuffer'
+          // 'Accept': 'application/json'
         },
-        responseType: 'blob'
+        responseType: 'arraybuffer'
       },
 
       deleteDocument: {
