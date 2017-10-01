@@ -155,7 +155,8 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					documentId = request.getParameter("documentId");
 					url = eSignBaseUrl + "/document/" + documentId;
 					obj = (JSONObject) parser.parse(request.getReader());
-					resValue = processPostPutRequest(HTTP_METHOD_PUT, url, obj.toString(), AUTHENTICATION_METHOD_OAUTH, request);
+					dataObj = (JSONObject) obj.get("document");
+					resValue = processPostPutRequest(HTTP_METHOD_PUT, url, dataObj.toString(), AUTHENTICATION_METHOD_OAUTH, request);
 					resObj = (JSONObject) parser.parse(resValue);
 					out = response.getWriter();
 					out.print(resObj);

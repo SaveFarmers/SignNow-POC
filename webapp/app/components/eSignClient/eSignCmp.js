@@ -72,8 +72,8 @@ myApp.component('eSignCmp', {
         }
         for (var i = 0; i<ctrl.allDocuments.length; i++) {
           var obj = ctrl.allDocuments[i];
-          setImage(obj);
-          obj.image = "http://localhost:8080/SignNow/eSign?request=THUMBNAILS&requestUrl=" + obj.thumbnail.small;
+          // setImage(obj);
+          obj.image = obj.thumbnail.small + "&access_token=" + $localStorage.cre.access_token;
         }
       });
     };
@@ -100,7 +100,7 @@ myApp.component('eSignCmp', {
     };
 
     ctrl.updateDocument = function(doc) {
-      /*var doc1 = {
+      var doc1 = {
         "texts":[
           {
             "size":8,
@@ -108,7 +108,7 @@ myApp.component('eSignCmp', {
             "y":72,
             "page_number":0,
             "font":"Arial",
-            "data":"a sample text field",
+            "data":"a sample text field",
             "line_height":9.075
           }
         ],
@@ -123,13 +123,14 @@ myApp.component('eSignCmp', {
         ],
         "fields":[
           {
-            "x":305,
-            "y":18,
-            "width":122,
-            "height":34,
-            "page_number":0,
-            "role":"tatonka",
-            "required":true,
+            "required": true,
+            "height": 15,
+            "width": 200,
+            "page_number": 0,
+            "y": 500,
+            "x": 150,
+            "label": "Some Stuff",
+            "role":"signer1",
             "type":"signature"
           },
           {
@@ -138,8 +139,8 @@ myApp.component('eSignCmp', {
             "width":60,
             "height":12,
             "page_number":0,
-            "label":"a sample label",
-            "role":"tatonka",
+            "label":"a sample label",
+            "role":"signer1",
             "required":true,
             "type":"text"
           },
@@ -149,7 +150,7 @@ myApp.component('eSignCmp', {
             "width":41,
             "height":26,
             "page_number":0,
-            "role":"tatonka",
+            "role":"signer1",
             "required":true,
             "type":"initials"
           },
@@ -159,7 +160,7 @@ myApp.component('eSignCmp', {
             "width":12,
             "height":12,
             "page_number":0,
-            "role":"tatonka",
+            "role":"CEO",
             "required":true,
             "type":"checkbox"
           },
@@ -189,33 +190,34 @@ myApp.component('eSignCmp', {
             "role": "signer",
             "required": true,
             "type": "radiobutton",
-            "name": "GROUP_NAME"
-          }],
-        "radio": [
-        {
-          "page_number": "0",
-          "x": "10",
-          "y": "20",
-          "width": "25",
-          "height": "25",
-          "checked": "0",
-          "value": "apple",
-          "created": "123456789"
-        },
-        {
-          "page_number": "0",
-          "x": "40",
-          "y": "20",
-          "width": "25",
-          "height": "25",
-          "checked": "0",
-          "value": "cherry",
-          "created": "123456789"
-        }
-      ]
-      };*/
+            "name": "GROUP_NAME",
+            "radio": [
+              {
+                "page_number": "0",
+                "x": "10",
+                "y": "20",
+                "width": "25",
+                "height": "25",
+                "checked": "0",
+                "value": "apple",
+                "created": "123456789"
+              },
+              {
+                "page_number": "0",
+                "x": "40",
+                "y": "20",
+                "width": "25",
+                "height": "25",
+                "checked": "0",
+                "value": "cherry",
+                "created": "123456789"
+              }
+            ]
+          }
+        ]
+      }
 
-      var doc1 = {
+      var doc2 = {
         "checks":[
           {
             "width":12,
@@ -271,7 +273,7 @@ myApp.component('eSignCmp', {
       var binary = '';
       var bytes = new Uint8Array( buffer );
       var len = bytes.byteLength;
-      console.log(len);
+      // console.log(len);
       for (var i = 0; i < len; i++) {
         binary += String.fromCharCode( bytes[ i ] );
       }
