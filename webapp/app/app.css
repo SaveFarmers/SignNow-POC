@@ -45,6 +45,18 @@ a.link-icon {
   color: #0044cc;
 }
 
+.input {
+  width: 200px;
+  height: 30px;
+  /*margin-left: 20px;*/
+  margin-bottom: 10px;
+  padding: 3px;
+}
+
+.textarea {
+
+}
+
 table {
   border-collapse: collapse;
   font-feature-settings: "kern", "liga", "tnum";

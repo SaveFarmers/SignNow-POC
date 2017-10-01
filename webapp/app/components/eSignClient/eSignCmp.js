@@ -67,7 +67,7 @@ myApp.component('eSignCmp', {
           response = $filter('orderBy')(response, 'original_filename');
         }
         ctrl.allDocuments = response;
-        if (!ctrl.currentDocument) {
+        if (!ctrl.currentDocument && ctrl.allDocuments.length > 0) {
           ctrl.getDocument(ctrl.allDocuments[0]);
         }
         for (var i = 0; i<ctrl.allDocuments.length; i++) {
@@ -100,6 +100,56 @@ myApp.component('eSignCmp', {
     };
 
     ctrl.updateDocument = function(doc) {
+
+      var doc3 = {
+        "fields": [
+          {
+            "required": true,
+            "height": 15,
+            "width": 200,
+            "page_number": 0,
+            "y": 500,
+            "x": 150,
+            "label": "Full Signature",
+            "role": "signer1",
+            "type": "signature"
+          },
+          {
+            "required": true,
+            "height": 15,
+            "width": 200,
+            "page_number": 0,
+            "y": 600,
+            "x": 150,
+            "label": "Full Signature",
+            "role": "signer2",
+            "type": "signature"
+          },
+          {
+            "x": 409,
+            "y": 67,
+            "width": 41,
+            "height": 26,
+            "page_number": 0,
+            "role": "signer1",
+            "label": "Initials",
+            "required": true,
+            "type": "initials"
+          },
+          {
+            "x": 409,
+            "y": 167,
+            "width": 41,
+            "height": 26,
+            "page_number": 0,
+            "role": "signer2",
+            "label": "Initials",
+            "required": true,
+            "type": "initials"
+          }
+        ]
+      };
+
       var doc1 = {
         "texts":[
           {
@@ -229,9 +279,9 @@ myApp.component('eSignCmp', {
         ]
       };
 
-      APIService.eSign.updateDocument({request: 'UPDATE_DOCUMENT', documentId: doc.id}, {document: doc1}).$promise.then(function(response) {
+      APIService.eSign.updateDocument({request: 'UPDATE_DOCUMENT', documentId: doc.id}, {document: doc3}).$promise.then(function(response) {
         console.log(response);
-        ctrl.getDocument(doc);
+        ctrl.getAllDocuments();
       });
     }
 
@@ -262,11 +312,11 @@ myApp.component('eSignCmp', {
       })
     };
 
-    ctrl.sendInvite = function(doc, recipients) {
+    ctrl.sendFreeFormInvite = function(doc, recipients) {
       APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: doc.id, involvedParties: {'from': $localStorage.email, 'to': recipients}}).$promise.then(function(response) {
         ctrl.getAllDocuments();
       })
-    }
+    };
 
     // Convert the buffer to base64
     var _arrayBufferToBase64 = function( buffer ) {
@@ -279,5 +329,49 @@ myApp.component('eSignCmp', {
       }
       return window.btoa( binary );
     };
+
+    ctrl.openRolesBasedInvite = function(doc) {
+      ctrl.collectRoleBasedInvitationDetails = true;
+      ctrl.invite = {
+        from: $localStorage.email,
+        subject: "'" + $localStorage.email + "' Needs Your Signature'",
+        message: "'" + $localStorage.email + "' invited you to sign '" + doc.original_filename + "'.",
+        recipients: []
+      };
+      ctrl.addInvitee();
+    };
+
+    ctrl.addInvitee = function() {
+      ctrl.invite.recipients.push({role: {}, email: '', order: 1});
+    }
+    
+    ctrl.sendRoleBasedInvite = function () {
+
+      var inviteObj = {
+        from: ctrl.invite.from,
+        subject: ctrl.invite.subject,
+        message: ctrl.invite.message,
+        to: []
+      };
+
+      for (var i = 0; i<ctrl.invite.recipients.length; i++) {
+        var obj = ctrl.invite.recipients[i];
+        inviteObj.to.push({
+          email: obj.email,
+          role_id: obj.role.unique_id,
+          role: obj.role.name,
+          order: obj.order
+        })
+      }
+
+      APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: ctrl.currentDocument.id, involvedParties: inviteObj}).$promise.then(function(response) {
+        console.log(response);
+        ctrl.getAllDocuments();
+      })
+
+      /**
+       * {"to":[{"email":"tm1@mailinator.com","role_id":"2e55f53dd32e77753b35d537ed6e65c6d9b5df1e","role":"Client","order":1},{"email":"tm2@mailinator.com","role_id":"54e0c633b9dedcd5af37bd6bf69a3984e58c383c","role":"Sales","order":1}],"from":"ln@SignNow.com","cc":[],"subject":"ln@SignNow.com Needs Your Signature","message":"ln@SignNow.com invited you to sign \"document.pdf\"."}
+       */
+    }
   }
 });
