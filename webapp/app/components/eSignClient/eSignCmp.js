@@ -366,12 +366,10 @@ myApp.component('eSignCmp', {
 
       APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: ctrl.currentDocument.id, involvedParties: inviteObj}).$promise.then(function(response) {
         console.log(response);
+        ctrl.collectRoleBasedInvitationDetails = false;
+        ctrl.invite = {};
         ctrl.getAllDocuments();
-      })
-
-      /**
-       * {"to":[{"email":"tm1@mailinator.com","role_id":"2e55f53dd32e77753b35d537ed6e65c6d9b5df1e","role":"Client","order":1},{"email":"tm2@mailinator.com","role_id":"54e0c633b9dedcd5af37bd6bf69a3984e58c383c","role":"Sales","order":1}],"from":"ln@SignNow.com","cc":[],"subject":"ln@SignNow.com Needs Your Signature","message":"ln@SignNow.com invited you to sign \"document.pdf\"."}
-       */
+      });
     }
   }
 });
