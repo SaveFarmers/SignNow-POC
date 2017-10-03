@@ -30,6 +30,23 @@ a.lined {
   border-bottom: 1px solid #0044cc;
 }
 
+.status {
+  display: block;
+  border: 1px solid rgba(159,157,155,0.25);
+  align-items: flex-start;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+.status.success {
+  color: green;
+  border: 1px solid darkgreen;
+}
+
+.status.error {
+  color: red;
+  border: 1px solid darkred;
+}
+
 a.link {
   cursor: pointer;
   color: #0044cc;
