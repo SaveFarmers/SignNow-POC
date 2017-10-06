@@ -32,7 +32,9 @@ myApp.component('eSignCmp', {
       var requestObj = {
         data: ctrl.user
       };
+      ctrl.isLoading = true;
       APIService.eSign.getOAuthToken({request: 'GET_OAUTH_TOKEN'}, requestObj).$promise.then(function(response) {
+        ctrl.isLoading = false;
         console.log(response);
         $localStorage.cre = response;
         $localStorage.email = ctrl.user.email;
@@ -44,7 +46,7 @@ myApp.component('eSignCmp', {
     ctrl.uploadFile = function() {
 
       var baseURL = 'http://localhost:8080/SignNow/eSign';
-
+      ctrl.isLoading = true;
       upload({
         url: baseURL + '?request=FILE_UPLOAD',
         method: 'POST',
@@ -55,7 +57,9 @@ myApp.component('eSignCmp', {
 
       }).then(
           function (response) {
+            ctrl.isLoading = false;
             if (response.data) {
+              angular.element("input[type='file']").val(null);
               setStatus({
                 success: true,
                 message: 'File is uploaded successfully...'
@@ -73,7 +77,9 @@ myApp.component('eSignCmp', {
     }
     ctrl.getAllDocuments = function() {
 
+      ctrl.isLoading = true;
       APIService.eSign.getAllDocuments({request: 'GET_ALL_DOCUMENTS'}).$promise.then(function(response) {
+        ctrl.isLoading = false;
         if (response && response.length > 0) {
           response = $filter('orderBy')(response, 'created', true);
         }
@@ -85,6 +91,7 @@ myApp.component('eSignCmp', {
           var obj = ctrl.allDocuments[i];
           // setImage(obj);
           obj.image = obj.thumbnail.small + "&access_token=" + $localStorage.cre.access_token;
+          obj.displayDate =toDateTime(obj.created);
         }
       });
     };
@@ -110,7 +117,7 @@ myApp.component('eSignCmp', {
       });
     };
 
-    ctrl.updateDocument = function(doc) {
+    ctrl.updateDocument = function() {
 
      /* var doc3 = {
         "fields": [
@@ -293,7 +300,7 @@ myApp.component('eSignCmp', {
      if (ctrl.fields.length > 0) {
        APIService.eSign.updateDocument({
          request: 'UPDATE_DOCUMENT',
-         documentId: doc.id
+         documentId: ctrl.currentDocument.id
        }, {document: {fields: ctrl.fields}}).$promise.then(function (response) {
          setStatus({
            success: true,
@@ -328,7 +335,9 @@ myApp.component('eSignCmp', {
     };
 
     ctrl.deleteDocument = function(doc) {
+      ctrl.isLoading = true;
       APIService.eSign.deleteDocument({request: 'DELETE_DOCUMENT', documentId: doc.id}, {}).$promise.then(function(resposne) {
+        ctrl.isLoading = false;
         setStatus({
           success: true,
           message: 'File is deleted successfully...'
@@ -338,7 +347,9 @@ myApp.component('eSignCmp', {
     };
 
     ctrl.sendFreeFormInvite = function(doc, recipients) {
+      ctrl.isLoading = true;
       APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: doc.id, involvedParties: {'from': $localStorage.email, 'to': recipients}}).$promise.then(function(response) {
+        ctrl.isLoading = false;
         setStatus({
           success: true,
           message: 'Free Form Invite has been sent "' + recipients + '" successfully...'
@@ -375,7 +386,7 @@ myApp.component('eSignCmp', {
     }
     
     ctrl.sendRoleBasedInvite = function () {
-
+      ctrl.isLoading = true;
       var inviteObj = {
         from: ctrl.invite.from,
         subject: ctrl.invite.subject,
@@ -394,6 +405,7 @@ myApp.component('eSignCmp', {
       }
 
       APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: ctrl.currentDocument.id, involvedParties: inviteObj}).$promise.then(function(response) {
+        ctrl.isLoading = false;
         setStatus({
           success: true,
           message: 'Role Based Invite has been sent successfully...'
@@ -424,13 +436,34 @@ myApp.component('eSignCmp', {
     ctrl.openFieldDetails = function(field) {
       ctrl.currentField = field;
       $("#fieldDetails").modal();
-    }
+    };
+
     ctrl.closeModal = function() {
 
       for (var i = 0; i<ctrl.fields.length; i++) {
         var obj = ctrl.fields[i];
         console.log(obj);
       }
+    };
+
+    ctrl.getDocumentHistory = function(doc) {
+      ctrl.isLoading = true;
+      ctrl.getDocument(doc);
+      APIService.eSign.getDocumentHistory({request: 'GET_DOCUMENT_HISTORY', documentId: doc.id}).$promise.then(function(response) {
+        ctrl.isLoading = false;
+        ctrl.history = response;
+        console.log(ctrl.history);
+        for (var i = 0; i<ctrl.history.length; i++) {
+          var obj = ctrl.history[i];
+          obj.displayDate =toDateTime(obj.created);
+        }
+      });
+    }
+
+    function toDateTime(secs) {
+      var date = new Date(secs * 1000);
+      var date_string = date.toLocaleString('en-US');
+      return date_string;
     }
   }
 });

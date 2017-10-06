@@ -44,6 +44,15 @@ myApp.factory('APIService', function($resource) {
         }
       },
 
+      getDocumentHistory: {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        isArray: true
+      },
+
       thumbnails: {
         method: 'POST',
         headers: {

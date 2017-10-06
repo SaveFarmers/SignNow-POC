@@ -24,6 +24,10 @@
   padding-right: 0.3em;
 }
 
+.loading{
+  cursor: progress !important;
+}
+
 a.lined {
   cursor: pointer;
   color: #0044cc;
@@ -70,6 +74,11 @@ a.link-icon {
   padding: 3px;
 }
 
+.input.file {
+  border: 1px solid #D3DCE0;
+  width: 300px;
+}
+
 .textarea {
 
 }
@@ -114,4 +123,56 @@ table tr.nestedTable:hover td {
 }
 table tr.nestedTable tr:hover td {
   background: #f2f5f7 !important;
+}
+
+.style1 {
+  top: 333px;
+  left: 284px;
+  width: 291px;
+  height: 29px;
+}
+
+.snintegrations-integration-container {
+  position: absolute;
+  overflow: visible;
+  z-index: 9;
+}
+
+.sndetail-role-1 {
+  background-color: rgba(0,119,200,.85);
+  border: 1px solid #00538c;
+  -webkit-transition: background-color,.2s;
+  -o-transition: background-color,.2s;
+  transition: background-color,.2s;
+}
+
+.sndetail-detail {
+  width: 100%;
+  height: 100%;
+  background: rgba(210,210,210,.7);
+  border: 1px solid rgba(147,147,147,.9);
+  cursor: pointer;
+  z-index: 5;
+}
+
+.sn-fill-container {
+  width: 100%;
+  height: 100%;
+}
+
+.snintegrations-integration-container>span {
+  font-size: 13px;
+  text-align: center;
+  line-height: 13px;
+  font-weight: 700;
+  text-shadow: 0 1px rgba(255,255,255,.3);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  left: 0;
+  right: 0;
+  height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

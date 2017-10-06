@@ -98,6 +98,7 @@ public class SignNowIntegrationServlet extends HttpServlet {
 			JSONParser parser = new JSONParser();
 			JSONObject obj = null; 
 			JSONObject resObj = null;
+			JSONArray jsonArray = null;
 			String resValue = null;
 			response.setContentType("application/json");
 			PrintWriter out = null;
@@ -135,9 +136,18 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					out.print(resObj);
 					break;
 					
+				case "GET_DOCUMENT_HISTORY":
+					documentId = request.getParameter("documentId");
+					resValue = processGetRequest(eSignBaseUrl + "/document/" + documentId + "/historyfull", request);
+					jsonArray = (JSONArray) parser.parse(resValue);
+					out = response.getWriter();
+					out.print(jsonArray);
+					break;
+					
+					
 				case "GET_ALL_DOCUMENTS":
 					resValue = processGetRequest(eSignBaseUrl + "/user/documentsv2", request);
-					JSONArray jsonArray = (JSONArray) parser.parse(resValue);
+					jsonArray = (JSONArray) parser.parse(resValue);
 					out = response.getWriter();
 					out.print(jsonArray);
 					break;
