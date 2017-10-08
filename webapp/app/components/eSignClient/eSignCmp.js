@@ -1,7 +1,7 @@
 myApp.component('eSignCmp', {
   templateUrl: 'components/eSignClient/eSignCmp.html',
   controllerAs: 'ctrl',
-  /* @ngInject */ //This is for Inline Array Annotation for Dependency Injection
+  /* @ngInject */ //This is for Inline Array Annotation for Dependency Injection - Required when minification is done
   controller: function (APIService, $localStorage, upload, $q, $http, $filter, $timeout) {
 
     var ctrl = this;
@@ -15,7 +15,8 @@ myApp.component('eSignCmp', {
       currentDocument: undefined,
       recipients: [],
       loggedIn: false,
-      fields: []
+      fields: [],
+      storage: $localStorage
     });
 
     ctrl.$onInit = function() {
@@ -25,7 +26,10 @@ myApp.component('eSignCmp', {
     ctrl.ping = function() {
       APIService.eSign.pingServlet({request: 'PING'}).$promise.then(function(response) {
         console.log(response);
-      })
+        if (ctrl.storage.cre) {
+          ctrl.getAllDocuments();
+        }
+      });
     };
 
     ctrl.getOAuthToken = function() {
@@ -51,8 +55,7 @@ myApp.component('eSignCmp', {
         url: baseURL + '?request=FILE_UPLOAD',
         method: 'POST',
         data: {
-          file: ctrl.inputFile,
-          data: '[t:s;r:y;o:"CEO";w:100;h:15;]'
+          file: ctrl.inputFile
         }
 
       }).then(
@@ -114,6 +117,7 @@ myApp.component('eSignCmp', {
         ctrl.currentDocument = response;
         ctrl.showDocument = true;
         ctrl.loadCurrentPage(ctrl.currentDocument.pages[0], 0);
+        ctrl.getDocumentHistory(ctrl.currentDocument, true);
       });
     };
 
@@ -371,7 +375,6 @@ myApp.component('eSignCmp', {
     };
 
     ctrl.openRolesBasedInvite = function(doc) {
-      ctrl.collectRoleBasedInvitationDetails = true;
       ctrl.invite = {
         from: $localStorage.email,
         subject: "'" + $localStorage.email + "' Needs Your Signature'",
@@ -379,6 +382,7 @@ myApp.component('eSignCmp', {
         recipients: []
       };
       ctrl.addInvitee();
+      $("#inviteDetails").modal();
     };
 
     ctrl.addInvitee = function() {
@@ -438,6 +442,28 @@ myApp.component('eSignCmp', {
       $("#fieldDetails").modal();
     };
 
+    ctrl.updateFieldValues = function() {
+
+      switch(ctrl.currentField.type) {
+        case 'signature':
+          ctrl.currentField.label = 'Full Signature';
+          ctrl.currentField.width = 200;
+          break;
+        case 'text':
+          ctrl.currentField.label = 'Your Address';
+          ctrl.currentField.width = 400;
+          break;
+        case 'initials':
+          ctrl.currentField.label = 'Initials';
+          ctrl.currentField.width = 40;
+          break;
+        case 'checkbox':
+          ctrl.currentField.label = 'I Agree the Terms and Conditions';
+          ctrl.currentField.width = 20;
+          break;
+      }
+    };
+
     ctrl.closeModal = function() {
 
       for (var i = 0; i<ctrl.fields.length; i++) {
@@ -446,9 +472,11 @@ myApp.component('eSignCmp', {
       }
     };
 
-    ctrl.getDocumentHistory = function(doc) {
+    ctrl.getDocumentHistory = function(doc, dontLoadDocument) {
       ctrl.isLoading = true;
-      ctrl.getDocument(doc);
+      if (!dontLoadDocument) {
+        ctrl.getDocument(doc);
+      }
       APIService.eSign.getDocumentHistory({request: 'GET_DOCUMENT_HISTORY', documentId: doc.id}).$promise.then(function(response) {
         ctrl.isLoading = false;
         ctrl.history = response;
