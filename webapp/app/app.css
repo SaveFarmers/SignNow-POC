@@ -153,7 +153,7 @@ table tr.nestedTable tr:hover td {
 
 
 .sndetail-role-1 {
-  background-color: rgba(0,119,200,.85);
+  background-color: rgba(0,119,200,.5);
   border: 1px dashed #00538c;
   -webkit-transition: background-color,.2s;
   -o-transition: background-color,.2s;
@@ -175,4 +175,10 @@ table tr.nestedTable tr:hover td {
   height: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.logout {
+  position: absolute;
+  top: 10px;
+  right: 30px;
 }

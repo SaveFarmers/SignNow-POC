@@ -13,8 +13,11 @@
     </div>
   </div>
 
-  <div  ng-if="ctrl.status" class="status" ng-class="{'success': ctrl.status.success, 'error': !ctrl.status.success}">
+  <div style="margin-bottom: 20px;" ng-if="ctrl.status" class="status" ng-class="{'success': ctrl.status.success, 'error': !ctrl.status.success}">
     {{ctrl.status.message}}
+  </div>
+  <div class="logout" ng-if="ctrl.storage.cre">
+    <a class="link pull-right" href="#" ng-click="ctrl.logout()">Logout</a>
   </div>
   <div ng-if="ctrl.storage.cre"
        style="display: block; border: 1px solid rgba(159,157,155,0.25); align-items: flex-start; padding: 30px;">
@@ -49,7 +52,9 @@
               <td>
                 <div>
                   <div>
-                    <a class="link" ng-click="ctrl.getDocument(doc)">{{doc.original_filename}}</a>
+                    <a class="link" ng-click="ctrl.getDocument(doc)">{{doc.original_filename}}
+                      <i ng-if="doc.template" style="color: green;" class="fa fa-star fa-lg" aria-hidden="true"></i>
+                    </a>
                   </div>
                   <div style="opacity: 0.9; padding-top: 4px; font-size: 11px;">
                     Requests: {{doc.requests.length}}, Invites: {{doc.field_invites.length}}
@@ -63,18 +68,28 @@
                 </div>
               </td>
               <!--<td style="text-align: center"><img style="border: 1px solid #d3dce0;" width="100" height="100" ng-src="{{doc.receivedImage}}"></td>-->
-              <td style="text-align: center"><img style="border: 1px solid #d3dce0;" width="80" height="100"
-                                                  ng-src="{{doc.image}}"></td>
+              <td style="text-align: center;">
+                <div style=" position: relative; left: 0; top: 0; width: 80px; height: 100px;">
+                <img style="border: 1px solid #d3dce0;position: relative; left: 0; top: 0;" width="80" height="100" ng-src="{{doc.image}}">
+                <i ng-if="doc.signatures.length > 0" style="color: green; position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px;" class="fa fa-check-circle fa-lg" aria-hidden="true"></i>
+                </div>
+              </td>
               <td style="text-align: center">
-                <a class="link-icon" style="padding: 5px;" ng-click="ctrl.deleteDocument(doc)"><i
+                <a class="link-icon" style="padding: 5px;" ng-click="ctrl.deleteDocument(doc)" title="Delete"><i
                         class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
 
                 <a ng-if="doc.fields.length === 0" class="link-icon"
-                   ng-click="doc.collectFreeFormInviteDetails = true;">
+                   ng-click="doc.collectFreeFormInviteDetails = true;" title="Send Free Form Invite">
                   <i class="fa fa-share-square-o fa-lg"  aria-hidden="true"></i>
                 </a>
-                <a class="link-icon" ng-click="ctrl.getDocumentHistory(doc)">
-                  <i class="fa fa-history" aria-hidden="true"></i>
+                <a class="link-icon" ng-click="ctrl.getDocumentHistory(doc)" title="Get Full History">
+                  <i class="fa fa-history fa-lg" aria-hidden="true"></i>
+                </a>
+                <a  ng-if="!doc.template && doc.signatures.length === 0" class="link-icon" ng-click="ctrl.createTemplate(doc)" title="Convert into Template">
+                  <i class="fa fa-star-o fa-lg" aria-hidden="true"></i>
+                </a>
+                <a  ng-if="doc.template" class="link-icon" ng-click="ctrl.createDocumentFromTemplate(doc)" title="Create Document from Template">
+                  <i class="fa fa-clone fa-lg" aria-hidden="true"></i>
                 </a>
                 <span ng-if="doc.collectFreeFormInviteDetails">
                 <input type="text" placeholder="Recipient Email" ng-model="ctrl.recipient">

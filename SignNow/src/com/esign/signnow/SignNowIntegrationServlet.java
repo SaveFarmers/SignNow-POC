@@ -172,6 +172,26 @@ public class SignNowIntegrationServlet extends HttpServlet {
 					out.print(resObj);
 					break;
 					
+				case "CONVERT_INTO_TEMPLATE":
+					obj = (JSONObject) parser.parse(request.getReader());					
+					url = eSignBaseUrl + "/template";
+					resValue = processPostPutRequest(HTTP_METHOD_POST, url, obj.toString(), AUTHENTICATION_METHOD_OAUTH, request);
+					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
+					out.print(resObj);
+					break;
+					
+				case "CREATE_DOCUMENT_FROM_TEMPLATE":
+					documentId = request.getParameter("templateId");
+					url = eSignBaseUrl + "/template/" + documentId + "/copy";
+					
+					obj = (JSONObject) parser.parse(request.getReader());					
+					resValue = processPostPutRequest(HTTP_METHOD_POST, url, obj.toString(), AUTHENTICATION_METHOD_OAUTH, request);
+					resObj = (JSONObject) parser.parse(resValue);
+					out = response.getWriter();
+					out.print(resObj);
+					break;
+					
 				case "SEND_INVITE":
 					obj = (JSONObject) parser.parse(request.getReader());
 					documentId = (String) obj.get("documentId");

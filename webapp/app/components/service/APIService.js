@@ -43,6 +43,20 @@ myApp.factory('APIService', function($resource) {
           'Accept': 'application/json'
         }
       },
+      createTemplate: {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      },
+      createDocumentFromTemplate: {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      },
 
       getDocumentHistory: {
         method: 'GET',

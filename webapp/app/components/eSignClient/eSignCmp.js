@@ -486,6 +486,38 @@ myApp.component('eSignCmp', {
           obj.displayDate =toDateTime(obj.created);
         }
       });
+    };
+
+    ctrl.createTemplate = function(doc) {
+      ctrl.isLoading = true;
+      APIService.eSign.createTemplate({request: 'CONVERT_INTO_TEMPLATE'}, {document_name: doc.original_filename, document_id: doc.id}).$promise.then(function(response) {
+        ctrl.isLoading = false;
+        console.log(response);
+        setStatus({
+          success: true,
+          message: 'Created a new template...'
+        });
+        ctrl.getAllDocuments();
+      });
+    };
+
+    ctrl.createDocumentFromTemplate = function(doc) {
+      ctrl.isLoading = true;
+      var date = new Date();
+      var dateStr = date.getDate() + "" + (date.getMonth() + 1) + date.getFullYear() + "_" + date.getHours() + date.getMinutes();
+      APIService.eSign.createDocumentFromTemplate({request: 'CREATE_DOCUMENT_FROM_TEMPLATE', templateId: doc.id}, {document_name: doc.original_filename + "_" + dateStr}).$promise.then(function(response) {
+        ctrl.isLoading = false;
+        console.log(response);
+        setStatus({
+          success: true,
+          message: 'Created a new document from the template...'
+        });
+        ctrl.getAllDocuments();
+      });
+    };
+
+    ctrl.logout = function() {
+      ctrl.storage.$reset();
     }
 
     function toDateTime(secs) {
