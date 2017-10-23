@@ -2,7 +2,7 @@
 
 // Declare app level module which depends on views, and components
 var myApp = angular.module('myApp', [
- 'ngResource', 'ngStorage', 'lr.upload'
+ 'ngResource', 'ngStorage', 'lr.upload', 'ngSanitize'
 ]);
 
 myApp.config(function ($httpProvider) {

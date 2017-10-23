@@ -2,7 +2,7 @@ myApp.component('eSignCmp', {
   templateUrl: 'components/eSignClient/eSignCmp.html',
   controllerAs: 'ctrl',
   /* @ngInject */ //This is for Inline Array Annotation for Dependency Injection - Required when minification is done
-  controller: function (APIService, $localStorage, upload, $q, $http, $filter, $timeout) {
+  controller: function (APIService, $localStorage, upload, $q, $http, $filter, $timeout, $sce) {
 
     var ctrl = this;
 
@@ -16,6 +16,7 @@ myApp.component('eSignCmp', {
       recipients: [],
       loggedIn: false,
       fields: [],
+      htmlFields: [],
       storage: $localStorage
     });
 
@@ -388,7 +389,7 @@ myApp.component('eSignCmp', {
     ctrl.addInvitee = function() {
       ctrl.invite.recipients.push({role: {}, email: '', order: 1});
     }
-    
+
     ctrl.sendRoleBasedInvite = function () {
       ctrl.isLoading = true;
       var inviteObj = {
@@ -434,6 +435,51 @@ myApp.component('eSignCmp', {
         label: 'Full Signature'
       });
       ctrl.currentField = ctrl.fields[ctrl.fields.length - 1];
+      ctrl.currentFieldType = 'DOCUMENT';
+      $("#fieldDetails").modal();
+    };
+
+    ctrl.collectHTMLFieldDetails = function (ev) {
+      ctrl.htmlFields.push({
+        x: ev.target.offsetLeft,
+        y: ev.target.offsetTop,
+        targetElementId: ev.target.id,
+        page_number: 0,
+        width: 200,
+        height: 20,
+        required: true,
+        type: 'signature',
+        role: 'Signer1',
+        label: 'Full Signature'
+      });
+
+      var css = "@element '#" + ev.target.id + "'{#htmlField_" + (ctrl.htmlFields.length - 1) + "{ top: eval('offsetTop')px; left: eval('offsetLeft')px;}}",
+          head = document.head;
+
+      var style;
+      var x = document.getElementsByTagName("STYLE");
+      if (!x) {
+        style = document.createElement('style');
+      } else {
+        style = x[0];
+      }
+
+      style.type = 'text/css';
+      if (style.styleSheet){
+        style.styleSheet.cssText = css;
+      } else {
+        style.appendChild(document.createTextNode(css));
+      }
+
+      head.appendChild(style);
+      $timeout(function() {
+        var nullString = undefined;
+        style.removeAttribute('data-eqcss-read');
+        EQCSS.load();
+      });
+
+      ctrl.currentField = ctrl.htmlFields[ctrl.htmlFields.length - 1];
+      ctrl.currentFieldType = 'HTML';
       $("#fieldDetails").modal();
     };
 
@@ -464,12 +510,24 @@ myApp.component('eSignCmp', {
       }
     };
 
-    ctrl.closeModal = function() {
+    ctrl.closeModal = function(rollback) {
 
-      for (var i = 0; i<ctrl.fields.length; i++) {
-        var obj = ctrl.fields[i];
-        console.log(obj);
+      if (rollback) {
+        if (ctrl.currentFieldType === 'DOCUMENT') {
+          ctrl.fields.pop();
+          for (var i = 0; i<ctrl.fields.length; i++) {
+            var obj = ctrl.fields[i];
+            console.log(obj);
+          }
+        } else {
+          ctrl.htmlFields.pop();
+          for (var i = 0; i<ctrl.htmlFields.length; i++) {
+            var obj = ctrl.htmlFields[i];
+            console.log(obj);
+          }
+        }
       }
+
     };
 
     ctrl.getDocumentHistory = function(doc, dontLoadDocument) {
@@ -518,6 +576,31 @@ myApp.component('eSignCmp', {
 
     ctrl.logout = function() {
       ctrl.storage.$reset();
+    }
+
+    ctrl.getHtmlContent = function() {
+      ctrl.htmlContent = '';
+      $http.get('sampleContract.html').then(function(response) {
+        ctrl.htmlContent = $sce.trustAsHtml(response.data);
+        $timeout(function() {
+          addListeners();
+        })
+      });
+    };
+
+    ctrl.replaceDynamicContent = function() {
+      document.getElementById('instruct17').innerText = "This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written."
+
+      document.getElementById('instruct16').innerText = "It was agreed that Ngomme & Segwagwa Attorneys should pay a total service fee of P28000 over three (3) Months’ time frame with the first P7000 (Seven Thousand Pula) payable on the day of the signing of this agreement and the other installments of P7000 (Seven Thousand Pula) being payable on the 5th of every month. Failure to pay the monthly installments on the agreed dates will result in the balance amount to accrue an interest of 30% per month and that the collection all the fees and costs that Delswiz Management Consultant (Pty) Ltd, may incur in collection of my balance owed as well as a competitive interest rate to be added to the total amount owed.\n"
+    };
+
+    function addListeners() {
+      document.addEventListener('click', function(e) {
+        e = e || window.event;
+        var target = e.target || e.srcElement,
+            text = target.textContent || target.innerText;
+        console.log(target); console.log(text);
+      }, false);
     }
 
     function toDateTime(secs) {

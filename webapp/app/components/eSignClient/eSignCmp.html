@@ -3,183 +3,237 @@
        ng-if="!ctrl.storage.cre">
     <div style="margin: auto"><h3>Login</h3></div>
     <div style="width: 100%">
-      <div style="width: 30%;">Email</div> <div><input class="input" type="text" name="email" ng-model="ctrl.user.email"></div>
+      <div style="width: 30%;">Email</div>
+      <div><input class="input" type="text" name="email" ng-model="ctrl.user.email"></div>
     </div>
     <div>
-      <div style="width: 30%;">Password</div> <div><input class="input" type="password" name="password" ng-model="ctrl.user.password"></div>
+      <div style="width: 30%;">Password</div>
+      <div><input class="input" type="password" name="password" ng-model="ctrl.user.password"></div>
     </div>
     <div>
       <button type="button" ng-click="ctrl.getOAuthToken()">Login</button>
     </div>
   </div>
-
-  <div style="margin-bottom: 20px;" ng-if="ctrl.status" class="status" ng-class="{'success': ctrl.status.success, 'error': !ctrl.status.success}">
-    {{ctrl.status.message}}
-  </div>
-  <div class="logout" ng-if="ctrl.storage.cre">
-    <a class="link pull-right" href="#" ng-click="ctrl.logout()">Logout</a>
-  </div>
-  <div ng-if="ctrl.storage.cre"
-       style="display: block; border: 1px solid rgba(159,157,155,0.25); align-items: flex-start; padding: 30px;">
-    <div style="margin: auto"><h3>Upload File</h3></div>
-    <div>
-      <input class="input file" name="inputFile" type="file" bind-file="" ng-model="ctrl.inputFile" accept=".doc, .docx, .png, .pdf"
-             id="inputFile">
-    </div>
-    <div>
-      <button type="button" ng-click="ctrl.uploadFile()">Upload File</button>
-    </div>
-  </div>
-
-  <div ng-if="ctrl.storage.cre" style="padding: 30px 0;">
-    <div style="display: flex; width: 100%">
-      <div style="width: 45%; margin-right: 1%;">
-        <div style="display: flex;">
-          <div style="width: 50%;"><h3 style="margin-top: 0;">Documents</h3></div>
-          <div style="position: relative; right: -30%; top: 0;">
-            <button type="button" ng-click="ctrl.getAllDocuments();">Get Documents</button>
+  <div class="container" style="width: 98%;">
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#docs">Document Templates</a></li>
+      <li><a data-toggle="tab" href="#htmlTemplate">HTML Template</a></li>
+    </ul>
+    <div class="tab-content">
+      <div id="docs" class="tab-pane fade in active">
+        <h3>Document Templates</h3>
+        <div style="margin-bottom: 20px;" ng-if="ctrl.status" class="status"
+             ng-class="{'success': ctrl.status.success, 'error': !ctrl.status.success}">
+          {{ctrl.status.message}}
+        </div>
+        <div class="logout" ng-if="ctrl.storage.cre">
+          <a class="link pull-right" href="#" ng-click="ctrl.logout()">Logout</a>
+        </div>
+        <div ng-if="ctrl.storage.cre"
+             style="display: block; border: 1px solid rgba(159,157,155,0.25); align-items: flex-start; padding: 30px;">
+          <div style="margin: auto"><h3>Upload File</h3></div>
+          <div>
+            <input class="input file" name="inputFile" type="file" bind-file="" ng-model="ctrl.inputFile"
+                   accept=".doc, .docx, .png, .pdf"
+                   id="inputFile">
+          </div>
+          <div>
+            <button type="button" ng-click="ctrl.uploadFile()">Upload File</button>
           </div>
         </div>
-        <div>
-          <table>
-            <thead>
-            <th width="30%">File</th>
-            <th width="30%" style="text-align: center">thumbnail</th>
-            <th width="20%" style="text-align: center">Actions</th>
-            </thead>
-            <tbody>
-            <tr ng-repeat="doc in ctrl.allDocuments">
-              <td>
-                <div>
-                  <div>
-                    <a class="link" ng-click="ctrl.getDocument(doc)">{{doc.original_filename}}
-                      <i ng-if="doc.template" style="color: green;" class="fa fa-star fa-lg" aria-hidden="true"></i>
+        <div ng-if="ctrl.storage.cre" style="padding: 30px 0;">
+          <div style="display: flex; width: 100%">
+            <div style="width: 45%; margin-right: 1%;">
+              <div style="display: flex;">
+                <div style="width: 50%;"><h3 style="margin-top: 0;">Documents</h3></div>
+                <div style="position: relative; right: -30%; top: 0;">
+                  <button type="button" ng-click="ctrl.getAllDocuments();">Get Documents</button>
+                </div>
+              </div>
+              <div>
+                <table>
+                  <thead>
+                  <th width="30%">File</th>
+                  <th width="30%" style="text-align: center">thumbnail</th>
+                  <th width="20%" style="text-align: center">Actions</th>
+                  </thead>
+                  <tbody>
+                  <tr ng-repeat="doc in ctrl.allDocuments">
+                    <td>
+                      <div>
+                        <div>
+                          <a class="link" ng-click="ctrl.getDocument(doc)">{{doc.original_filename}}
+                            <i ng-if="doc.template" style="color: green;" class="fa fa-star fa-lg"
+                               aria-hidden="true"></i>
+                          </a>
+                        </div>
+                        <div style="opacity: 0.9; padding-top: 4px; font-size: 11px;">
+                          Requests: {{doc.requests.length}}, Invites: {{doc.field_invites.length}}
+                        </div>
+                        <div style="opacity: 0.9; font-size: 11px;">
+                          Fields: {{doc.fields.length}}, Signatures: {{doc.signatures.length}}
+                        </div>
+                        <div style="opacity: 0.9; font-size: 11px;">
+                          Created: {{doc.displayDate}}
+                        </div>
+                      </div>
+                    </td>
+                    <!--<td style="text-align: center"><img style="border: 1px solid #d3dce0;" width="100" height="100" ng-src="{{doc.receivedImage}}"></td>-->
+                    <td style="text-align: center;">
+                      <div style=" position: relative; left: 0; top: 0; width: 80px; height: 100px;">
+                        <img style="border: 1px solid #d3dce0;position: relative; left: 0; top: 0;" width="80"
+                             height="100" ng-src="{{doc.image}}">
+                        <i ng-if="doc.signatures.length > 0"
+                           style="color: green; position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px;"
+                           class="fa fa-check-circle fa-lg" aria-hidden="true"></i>
+                      </div>
+                    </td>
+                    <td style="text-align: center">
+                      <a class="link-icon" style="padding: 5px;" ng-click="ctrl.deleteDocument(doc)" title="Delete"><i
+                              class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+                      <a ng-if="doc.fields.length === 0" class="link-icon"
+                         ng-click="doc.collectFreeFormInviteDetails = true;" title="Send Free Form Invite">
+                        <i class="fa fa-share-square-o fa-lg" aria-hidden="true"></i>
+                      </a>
+                      <a class="link-icon" ng-click="ctrl.getDocumentHistory(doc)" title="Get Full History">
+                        <i class="fa fa-history fa-lg" aria-hidden="true"></i>
+                      </a>
+                      <a ng-if="!doc.template && doc.signatures.length === 0" class="link-icon"
+                         ng-click="ctrl.createTemplate(doc)" title="Convert into Template">
+                        <i class="fa fa-star-o fa-lg" aria-hidden="true"></i>
+                      </a>
+                      <a ng-if="doc.template" class="link-icon" ng-click="ctrl.createDocumentFromTemplate(doc)"
+                         title="Create Document from Template">
+                        <i class="fa fa-clone fa-lg" aria-hidden="true"></i>
+                      </a>
+                      <span ng-if="doc.collectFreeFormInviteDetails">
+                        <input type="text" placeholder="Recipient Email" ng-model="ctrl.recipient">
+                        <input type="button" value="Send Invite"
+                               ng-click="ctrl.sendFreeFormInvite(doc, ctrl.recipient)">
+                      </span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div style="width: 54%; padding-left: 1%">
+              <div style="display: inline-flex; margin-bottom: 6px; width: 100%;">
+                <div style="width: 60%;">
+                  <a class="link"
+                     ng-class="{'active': ctrl.currentPage.pageIndex === $index || !ctrl.currentPage.pageIndex && $index === 0}"
+                     style="margin-right: 10px;" ng-repeat="page in ctrl.currentDocument.pages"
+                     ng-click="ctrl.loadCurrentPage(page, $index)">{{$index + 1}}
+                  </a>
+                </div>
+                <div style="padding-left: 30px; float: right; display: inline-table;">
+                  <h3 style="margin: 0 30px;">
+                    {{ctrl.currentDocument.original_filename}}
+                    <a ng-if="ctrl.fields.length > 0" class="link-icon" style="padding: 5px;"
+                       ng-click="ctrl.updateDocument()">
+                      <i class="fa fa-pencil-square-o"></i>
                     </a>
-                  </div>
-                  <div style="opacity: 0.9; padding-top: 4px; font-size: 11px;">
-                    Requests: {{doc.requests.length}}, Invites: {{doc.field_invites.length}}
-                  </div>
-                  <div style="opacity: 0.9; font-size: 11px;">
-                    Fields: {{doc.fields.length}}, Signatures: {{doc.signatures.length}}
-                  </div>
-                  <div style="opacity: 0.9; font-size: 11px;">
-                    Created: {{doc.displayDate}}
-                  </div>
+                    <a ng-if="ctrl.currentDocument.fields.length > 0" class="link"
+                       ng-click="ctrl.openRolesBasedInvite(ctrl.currentDocument)">
+                      <i style="padding-left: 5px;" class="fa fa-share" aria-hidden="true"></i>
+                    </a>
+                  </h3>
                 </div>
-              </td>
-              <!--<td style="text-align: center"><img style="border: 1px solid #d3dce0;" width="100" height="100" ng-src="{{doc.receivedImage}}"></td>-->
-              <td style="text-align: center;">
-                <div style=" position: relative; left: 0; top: 0; width: 80px; height: 100px;">
-                <img style="border: 1px solid #d3dce0;position: relative; left: 0; top: 0;" width="80" height="100" ng-src="{{doc.image}}">
-                <i ng-if="doc.signatures.length > 0" style="color: green; position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px;" class="fa fa-check-circle fa-lg" aria-hidden="true"></i>
-                </div>
-              </td>
-              <td style="text-align: center">
-                <a class="link-icon" style="padding: 5px;" ng-click="ctrl.deleteDocument(doc)" title="Delete"><i
-                        class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
-
-                <a ng-if="doc.fields.length === 0" class="link-icon"
-                   ng-click="doc.collectFreeFormInviteDetails = true;" title="Send Free Form Invite">
-                  <i class="fa fa-share-square-o fa-lg"  aria-hidden="true"></i>
+              </div>
+              <div style="position: relative; left: 0; top: 0;">
+                <!-- Display the File image -->
+                <img ng-click="ctrl.collectFieldDetails($event)"
+                     style="border: 1px solid #d3dce0;position: relative; left: 0; top: 0;"
+                     width="{{ctrl.currentPage.size.width}}"
+                     height="{{ctrl.currentPage.size.height}}" src="{{ctrl.currentPage.receivedImage}}">
+                <!-- Display the Signatures if any -->
+                <img style="position: absolute; top: {{sign.y + 'px'}}; left: {{sign.x + 'px'}};" width="{{sign.width}}"
+                     height="{{sign.height}}"
+                     ng-repeat="sign in ctrl.currentDocument.signatures | filter: {page_number: ctrl.currentPage.pageIndex}"
+                     ng-src='{{"data:image/png;base64," + sign.data}}'>
+                <!-- Display any text input fields collected from signers -->
+                <span style="position: absolute; top: {{(text.y) + 'px'}}; left: {{text.x + 'px'}};"
+                      ng-repeat="text in ctrl.currentDocument.texts | filter: {page_number: ctrl.currentPage.pageIndex}">{{text.data}}</span>
+                <!-- Fields which are yet to be updated -->
+                <a class="sndetail-role-1" ng-if="ctrl.currentDocument.signatures.length === 0"
+                   style="position: absolute; top: {{(field.y - 12) + 'px'}}; left: {{field.x + 'px'}}; width: {{field.width + 'px'}}; height: {{field.height + 'px'}}"
+                   ng-repeat="field in ctrl.fields | filter: {page_number: ctrl.currentPage.pageIndex}"
+                   ng-click="ctrl.openFieldDetails(field)">
+                  <span>{{field.label}}</span>
                 </a>
-                <a class="link-icon" ng-click="ctrl.getDocumentHistory(doc)" title="Get Full History">
-                  <i class="fa fa-history fa-lg" aria-hidden="true"></i>
+                <!-- Marker for fields which are yet to be updated -->
+                <a href='#' ng-repeat="field in ctrl.fields | filter: {page_number: ctrl.currentPage.pageIndex}"
+                   style="position: absolute; top: {{(field.y - 12) + 'px'}}; left: 5px;">
+                  <div class="arrow-right"></div>
+                  <div class="rectangle">{{field.role}}</div>
                 </a>
-                <a  ng-if="!doc.template && doc.signatures.length === 0" class="link-icon" ng-click="ctrl.createTemplate(doc)" title="Convert into Template">
-                  <i class="fa fa-star-o fa-lg" aria-hidden="true"></i>
+                <!-- Existing fields-->
+                <a class="sndetail-role-1" ng-if="ctrl.currentDocument.signatures.length === 0"
+                   style="position: absolute; top: {{(field.json_attributes.y - 12) + 'px'}}; left: {{field.json_attributes.x + 'px'}}; width: {{field.json_attributes.width + 'px'}}; height: {{field.json_attributes.height + 'px'}}"
+                   ng-repeat="field in ctrl.currentDocument.fields | filter: {json_attributes: {page_number: ctrl.currentPage.pageIndex}}"
+                   ng-click="ctrl.openFieldDetails(field)">
+                  <span>{{field.json_attributes.label}}</span>
                 </a>
-                <a  ng-if="doc.template" class="link-icon" ng-click="ctrl.createDocumentFromTemplate(doc)" title="Create Document from Template">
-                  <i class="fa fa-clone fa-lg" aria-hidden="true"></i>
+                <!-- Markers for existing fields-->
+                <a href='#'
+                   ng-repeat="field in ctrl.currentDocument.fields | filter: {json_attributes: {page_number: ctrl.currentPage.pageIndex}}"
+                   style="position: absolute; top: {{(field.json_attributes.y - 12) + 'px'}}; left: 5px;">
+                  <div class="arrow-right"></div>
+                  <div class="rectangle">{{field.role}}</div>
                 </a>
-                <span ng-if="doc.collectFreeFormInviteDetails">
-                <input type="text" placeholder="Recipient Email" ng-model="ctrl.recipient">
-                <input type="button" value="Send Invite" ng-click="ctrl.sendFreeFormInvite(doc, ctrl.recipient)">
-              </span>
-              </td>
-
-            </tr>
-            </tbody>
-          </table>
+              </div>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <h3>Document History</h3>
+            <table>
+              <th>Event</th>
+              <th>Email</th>
+              <th>Event Date</th>
+              <tbody>
+              <tr ng-repeat="row in ctrl.history | orderBy: 'created'">
+                <td>{{row.event}}</td>
+                <td>{{row.email}}</td>
+                <td>{{row.displayDate}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div style="width: 54%; padding-left: 1%">
-        <div style="display: inline-flex; margin-bottom: 6px; width: 100%;">
-          <div style="width: 60%;">
-            <a class="link"
-               ng-class="{'active': ctrl.currentPage.pageIndex === $index || !ctrl.currentPage.pageIndex && $index === 0}"
-               style="margin-right: 10px;" ng-repeat="page in ctrl.currentDocument.pages"
-               ng-click="ctrl.loadCurrentPage(page, $index)">{{$index + 1}}
-            </a>
-          </div>
-          <div style="padding-left: 30px; float: right; display: inline-table;">
-            <h3 style="margin: 0 30px;">
-            {{ctrl.currentDocument.original_filename}}
-              <a ng-if="ctrl.fields.length > 0" class="link-icon" style="padding: 5px;" ng-click="ctrl.updateDocument()">
-                <i class="fa fa-pencil-square-o"></i>
-              </a>
-              <a ng-if="ctrl.currentDocument.fields.length > 0" class="link" ng-click="ctrl.openRolesBasedInvite(ctrl.currentDocument)">
-                <i style="padding-left: 5px;" class="fa fa-share" aria-hidden="true"></i>
-              </a>
-            </h3>
-          </div>
+      <div id="htmlTemplate" class="tab-pane fade">
+        <div style="margin: 10px;">
+          <button type="button" ng-click="ctrl.getHtmlContent()">Get HTML Content</button>
+          <button type="button" ng-click="ctrl.replaceDynamicContent()">Replace Dynamic Content</button>
         </div>
-
-        <div style="position: relative; left: 0; top: 0;">
-
-          <!-- Display the File image -->
-          <img ng-click="ctrl.collectFieldDetails($event)" style="border: 1px solid #d3dce0;position: relative; left: 0; top: 0;" width="{{ctrl.currentPage.size.width}}"
-                  height="{{ctrl.currentPage.size.height}}" src="{{ctrl.currentPage.receivedImage}}">
-
-          <!-- Display the Signatures if any -->
-          <img style="position: absolute; top: {{sign.y + 'px'}}; left: {{sign.x + 'px'}};" width="{{sign.width}}" height="{{sign.height}}" ng-repeat="sign in ctrl.currentDocument.signatures | filter: {page_number: ctrl.currentPage.pageIndex}" ng-src='{{"data:image/png;base64," + sign.data}}'>
-
-          <!-- Display any text input fields collected from signers -->
-          <span style="position: absolute; top: {{(text.y) + 'px'}}; left: {{text.x + 'px'}};" ng-repeat="text in ctrl.currentDocument.texts | filter: {page_number: ctrl.currentPage.pageIndex}">{{text.data}}</span>
-
-          <!-- Fields which are yet to be updated -->
-          <a class="sndetail-role-1" ng-if="ctrl.currentDocument.signatures.length === 0" style="position: absolute; top: {{(field.y - 12) + 'px'}}; left: {{field.x + 'px'}}; width: {{field.width + 'px'}}; height: {{field.height + 'px'}}"  ng-repeat="field in ctrl.fields | filter: {page_number: ctrl.currentPage.pageIndex}" ng-click="ctrl.openFieldDetails(field)">
-            <span >{{field.label}}</span>
+        <div  style="position: relative; left: 0; top: 0;" ng-click="ctrl.collectHTMLFieldDetails($event)">
+          <!--<div class="cover"></div>-->
+          <div  ng-bind-html="ctrl.htmlContent" style="margin-top: 20px; border: 1px solid #d3dce0; " ></div>
+          <a class="sndetail-role-1"
+             style="position: absolute; width: {{field.width + 'px'}}; height: {{field.height + 'px'}};"
+             ng-repeat="field in ctrl.htmlFields"
+             ng-click="ctrl.openFieldDetails(field)"
+             id="htmlField_{{$index}}"
+          >
+            <span>{{field.label}}</span>
           </a>
-
           <!-- Marker for fields which are yet to be updated -->
-          <a href='#' ng-repeat="field in ctrl.fields | filter: {page_number: ctrl.currentPage.pageIndex}" style="position: absolute; top: {{(field.y - 12) + 'px'}}; left: 5px;"><div class="arrow-right"></div><div class="rectangle">{{field.role}}</div></a>
-
-
-          <!-- Existing fields-->
-          <a class="sndetail-role-1" ng-if="ctrl.currentDocument.signatures.length === 0" style="position: absolute; top: {{(field.json_attributes.y - 12) + 'px'}}; left: {{field.json_attributes.x + 'px'}}; width: {{field.json_attributes.width + 'px'}}; height: {{field.json_attributes.height + 'px'}}"  ng-repeat="field in ctrl.currentDocument.fields | filter: {json_attributes: {page_number: ctrl.currentPage.pageIndex}}" ng-click="ctrl.openFieldDetails(field)">
-            <span >{{field.json_attributes.label}}</span>
+          <a href='#' ng-repeat="field in ctrl.htmlFields " id="htmlLabel_{{$index}}"
+             style="position: absolute; top: {{(field.y) + 'px'}}; left: 5px;">
+            <div class="arrow-right"></div>
+            <div class="rectangle">{{field.role}}</div>
           </a>
-
-          <!-- Markers for existing fields-->
-
-          <a href='#' ng-repeat="field in ctrl.currentDocument.fields | filter: {json_attributes: {page_number: ctrl.currentPage.pageIndex}}" style="position: absolute; top: {{(field.json_attributes.y - 12) + 'px'}}; left: 5px;"><div class="arrow-right"></div><div class="rectangle">{{field.role}}</div></a>
-
-
         </div>
+        <!--<h3>HTML Templates</h3>
+        <div>
+          <iframe src="http://localhost:63342/SignNow-POC/app/sampleContract.html" width="950px" height="600px" frameborder="1"></iframe>
+        </div>-->
       </div>
-    </div>
-
-    <div style="width: 100%">
-      <h3>Document History</h3>
-      <table>
-          <th>Event</th>
-          <th>Email</th>
-          <th>Event Date</th>
-        <tbody>
-          <tr ng-repeat="row in ctrl.history | orderBy: 'created'">
-            <td>{{row.event}}</td>
-            <td>{{row.email}}</td>
-            <td>{{row.displayDate}}</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </div>
-
   <!-- Modal -->
   <div class="modal fade" id="inviteDetails" role="dialog">
     <div class="modal-dialog">
-
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -188,12 +242,13 @@
         </div>
         <div class="modal-body">
           <div
-               style="border: 1px solid #d3dce0;padding: 10px;margin-bottom: 5px;">
+                  style="border: 1px solid #d3dce0;padding: 10px;margin-bottom: 5px;">
             <div style="padding-bottom: 10px;">
               <div style="display: inline;">
                 <label style="position: relative; top: -15px;">Subject: </label>
                 <textarea cols="50" rows="3" ng-model="ctrl.invite.subject"></textarea>
-                <a  style="margin-left: 2px; white-space: nowrap;position: relative; top: -15px;" class="link" data-dismiss="modal" ng-click="ctrl.sendRoleBasedInvite()">Send Invite</a>
+                <a style="margin-left: 2px; white-space: nowrap;position: relative; top: -15px;" class="link"
+                   data-dismiss="modal" ng-click="ctrl.sendRoleBasedInvite()">Send Invite</a>
               </div>
               <div style="padding-top: 10px;">
                 <label style="position: relative; top: -15px;">Message: </label>
@@ -202,69 +257,77 @@
             </div>
             <div ng-repeat="recipient in ctrl.invite.recipients" style="display: flex; padding-bottom: 10px;">
               <div style="width: 40%">
-                Roles: <select  class="input" ng-model="recipient.role" name="roles" id="roles"
-                                ng-options="role as role.name for role in ctrl.currentDocument.roles"></select>
+                Roles: <select class="input" ng-model="recipient.role" name="roles" id="roles"
+                               ng-options="role as role.name for role in ctrl.currentDocument.roles"></select>
               </div>
               <div style="width: 40%">Email: <input class="input" type="text" ng-model="recipient.email"></div>
-              <div style="width: 10%">Order: <input style="width: 30px; height: 30px;" type="number" ng-model="recipient.order"></div>
+              <div style="width: 10%">Order: <input style="width: 30px; height: 30px;" type="number"
+                                                    ng-model="recipient.order"></div>
               <div ng-if="$index === ctrl.invite.recipients.length - 1">
-                <a  style="margin-left: 10px; white-space: nowrap; position: relative; top: 20px;" class="link" ng-click="ctrl.addInvitee()">Add</a>
+                <a style="margin-left: 10px; white-space: nowrap; position: relative; top: 20px;" class="link"
+                   ng-click="ctrl.addInvitee()">Add</a>
               </div>
             </div>
           </div>
-
+        </div>
       </div>
-
     </div>
   </div>
-  </div>
-
-
   <!-- Modal -->
   <div class="modal fade" id="fieldDetails" role="dialog">
     <div class="modal-dialog">
-
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal" ng-click="ctrl.closeModal(true)">&times;</button>
           <h4 class="modal-title">Configure Field</h4>
         </div>
         <div class="modal-body">
-
           <div>
             <label for="fieldType">Field Type: </label>
-            <select class="input" name="fieldType" id="fieldType" ng-change="ctrl.updateFieldValues()" ng-model="ctrl.currentField.type">
+            <select class="input" name="fieldType" id="fieldType" ng-change="ctrl.updateFieldValues()"
+                    ng-model="ctrl.currentField.type">
               <option value="signature">Signature</option>
               <option value="text">text</option>
               <option value="initials">Initials</option>
               <option value="checkbox">checkbox</option>
             </select>
-            <label   class="modal-field-right" for="isRequired">Is Required: </label>
+            <label class="modal-field-right" for="isRequired">Is Required: </label>
             <input type="checkbox" ng-model="ctrl.currentField.required" id="isRequired">
           </div>
           <div>
-            <label for="label">Label: </label><input class="input" type="text" id="label" ng-model="ctrl.currentField.label">
-            <label  class="modal-field-right" for="role">Role: </label>
+            <label for="label">Label: </label>
+            <input class="input" type="text" id="label"
+                   ng-model="ctrl.currentField.label">
+            <label class="modal-field-right" for="role">Role: </label>
             <input class="input" type="text" name="role" id="role" ng-model="ctrl.currentField.role">
           </div>
           <div>
             <div>
-              <label for="width">Width: </label><input class="input" type="number" id="width" ng-model="ctrl.currentField.width">
-              <label  class="modal-field-right" for="height">Height: </label><input class="input" type="number" id="height" ng-model="ctrl.currentField.height">
+              <label for="width">Width: </label>
+              <input class="input" type="number" id="width"
+                     ng-model="ctrl.currentField.width">
+              <label class="modal-field-right" for="height">Height: </label>
+              <input class="input" type="number"
+                     id="height"
+                     ng-model="ctrl.currentField.height">
             </div>
           </div>
-          <div >
-            <label for="x-axis">x-axis: </label><input class="input" type="number" ng-model="ctrl.currentField.x" id="x-axis">
-            <label  class="modal-field-right" for="y-axis">y-axis: </label><input class="input" type="number" ng-model="ctrl.currentField.y" id="y-axis">
+          <div>
+            <label for="x-axis">x-axis: </label>
+            <input class="input" type="number" ng-model="ctrl.currentField.x"
+                   id="x-axis">
+            <label class="modal-field-right" for="y-axis">y-axis: </label>
+            <input class="input" type="number"
+                   ng-model="ctrl.currentField.y"
+                   id="y-axis">
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="ctrl.closeModal()">Submit</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="ctrl.closeModal()">Submit
+          </button>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>
