@@ -2,7 +2,7 @@ myApp.component('eSignCmp', {
   templateUrl: 'components/eSignClient/eSignCmp.html',
   controllerAs: 'ctrl',
   /* @ngInject */ //This is for Inline Array Annotation for Dependency Injection - Required when minification is done
-  controller: function (APIService, $localStorage, upload, $q, $http, $filter, $timeout, $sce) {
+  controller: function (APIService, $localStorage, upload, $q, $http, $filter, $timeout, $sce, $window) {
 
     var ctrl = this;
 
@@ -383,7 +383,10 @@ myApp.component('eSignCmp', {
         recipients: []
       };
       ctrl.addInvitee();
-      $("#inviteDetails").modal();
+      ctrl.collectInviteDetailsFlag = true;
+      $timeout(function () {
+        $("#inviteDetails").modal();
+      });
     };
 
     ctrl.addInvitee = function() {
@@ -408,7 +411,7 @@ myApp.component('eSignCmp', {
           order: obj.order
         })
       }
-
+      ctrl.collectInviteDetailsFlag = false;
       APIService.eSign.invite({request: 'SEND_INVITE'}, {documentId: ctrl.currentDocument.id, involvedParties: inviteObj}).$promise.then(function(response) {
         ctrl.isLoading = false;
         setStatus({
@@ -436,7 +439,10 @@ myApp.component('eSignCmp', {
       });
       ctrl.currentField = ctrl.fields[ctrl.fields.length - 1];
       ctrl.currentFieldType = 'DOCUMENT';
-      $("#fieldDetails").modal();
+      ctrl.collectFieldDetailsFlag = true;
+      $timeout(function () {
+        $("#fieldDetails").modal();
+      });
     };
 
     ctrl.collectHTMLFieldDetails = function (ev) {
@@ -453,18 +459,21 @@ myApp.component('eSignCmp', {
         label: 'Full Signature'
       });
 
-      var css = "@element '#" + ev.target.id + "'{#htmlField_" + (ctrl.htmlFields.length - 1) + "{ top: eval('offsetTop')px; left: eval('offsetLeft')px;}}",
+      console.log('x: ' + ev.target.offsetLeft + ", y: " + ev.target.offsetTop);
+      var css = "@element '#" + ev.target.id + "'{.htmlField_" + (ctrl.htmlFields.length - 1) + "{ top: eval('offsetTop')px; left: eval('offsetLeft')px;}}",
           head = document.head;
 
       var style;
-      var x = document.getElementsByTagName("STYLE");
-      if (!x) {
+      //var x = document.getElementsByTagName("STYLE");
+      style = document.createElement('style');
+      /*if (!x) {
         style = document.createElement('style');
       } else {
         style = x[0];
-      }
+      }*/
 
       style.type = 'text/css';
+      style.id = 'eSign-style';
       if (style.styleSheet){
         style.styleSheet.cssText = css;
       } else {
@@ -480,13 +489,18 @@ myApp.component('eSignCmp', {
 
       ctrl.currentField = ctrl.htmlFields[ctrl.htmlFields.length - 1];
       ctrl.currentFieldType = 'HTML';
-      $("#fieldDetails").modal();
+      ctrl.collectFieldDetailsFlag = true;
+      $timeout(function() {
+        $("#fieldDetails").modal();
+      });
     };
 
     ctrl.openFieldDetails = function(field) {
       ctrl.currentField = field;
-      $("#fieldDetails").modal();
-    };
+      ctrl.collectFieldDetailsFlag = true;
+      $timeout(function() {
+        $("#fieldDetails").modal();
+      });    };
 
     ctrl.updateFieldValues = function() {
 
@@ -527,7 +541,9 @@ myApp.component('eSignCmp', {
           }
         }
       }
-
+      $('#fieldDetails').modal('hide');
+      $(".modal-backdrop").remove();
+      ctrl.collectFieldDetailsFlag = false;
     };
 
     ctrl.getDocumentHistory = function(doc, dontLoadDocument) {
@@ -588,10 +604,53 @@ myApp.component('eSignCmp', {
       });
     };
 
-    ctrl.replaceDynamicContent = function() {
-      document.getElementById('instruct17').innerText = "This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written."
+    ctrl.releaseElementBinding = function() {
+      /*var style = document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = '.cssClass { color: #F00; }';
+      document.getElementsByTagName('head')[0].appendChild(style);
 
-      document.getElementById('instruct16').innerText = "It was agreed that Ngomme & Segwagwa Attorneys should pay a total service fee of P28000 over three (3) Months’ time frame with the first P7000 (Seven Thousand Pula) payable on the day of the signing of this agreement and the other installments of P7000 (Seven Thousand Pula) being payable on the 5th of every month. Failure to pay the monthly installments on the agreed dates will result in the balance amount to accrue an interest of 30% per month and that the collection all the fees and costs that Delswiz Management Consultant (Pty) Ltd, may incur in collection of my balance owed as well as a competitive interest rate to be added to the total amount owed.\n"
+      document.getElementById('someElementId').className = 'cssClass';*/
+
+      for (var i = 0; i<ctrl.htmlFields.length; i++) {
+        var field = ctrl.htmlFields[i];
+        var element = document.getElementById('htmlField_' + i);
+        var style = window.getComputedStyle(element);
+        var top = style.getPropertyValue('top');
+        var left = style.getPropertyValue('left');
+        element.style.top = top;
+        element.style.left = left;
+        field.x = left;
+        field.y = top;
+      }
+
+      ctrl.releaseBinding = true;
+
+    };
+
+    $window.allowDrop = function (ev) {
+      console.log('ctrl.allowDrop');
+      ev.preventDefault();
+    }
+
+    $window.drag = function (ev) {
+      console.log('ctrl.drag');
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    $window.drop = function (ev) {
+      console.log('ctrl.drop');
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      // ev.target.appendChild(document.getElementById(data));
+      document.getElementById(data).style.top = ev.target.offsetTop + 'px';
+      document.getElementById(data).style.left = ev.target.offsetLeft + 'px';
+    }
+
+    ctrl.replaceDynamicContent = function() {
+      document.getElementById('instruct17').innerText = "This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written.This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written.This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written.This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written.This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written.This Agreement constitutes the entire agreement of the parties relating to the subject matter addressed in this Agreement. This Agreement supersedes all prior communications, contracts, or agreements between the parties with respect to the subject matter addressed in this Agreement, whether oral or written."
+
+      document.getElementById('instruct16').innerText = "It was agreed that Ngomme & Segwagwa Attorneys should pay a total service fee of P28000 over three (3) Months’ time frame with the first P7000 (Seven Thousand Pula) payable on the day of the signing of this agreement and the other installments of P7000 (Seven Thousand Pula) being payable on the 5th of every month. Failure to pay the monthly installments on the agreed dates will result in the balance amount to accrue an interest of 30% per month and that the collection all the fees and costs that Delswiz Management Consultant (Pty) Ltd, may incur in collection of my balance owed as well as a competitive interest rate to be added to the total amount owed.\nIt was agreed that Ngomme & Segwagwa Attorneys should pay a total service fee of P28000 over three (3) Months’ time frame with the first P7000 (Seven Thousand Pula) payable on the day of the signing of this agreement and the other installments of P7000 (Seven Thousand Pula) being payable on the 5th of every month. Failure to pay the monthly installments on the agreed dates will result in the balance amount to accrue an interest of 30% per month and that the collection all the fees and costs that Delswiz Management Consultant (Pty) Ltd, may incur in collection of my balance owed as well as a competitive interest rate to be added to the total amount owed.\nIt was agreed that Ngomme & Segwagwa Attorneys should pay a total service fee of P28000 over three (3) Months’ time frame with the first P7000 (Seven Thousand Pula) payable on the day of the signing of this agreement and the other installments of P7000 (Seven Thousand Pula) being payable on the 5th of every month. Failure to pay the monthly installments on the agreed dates will result in the balance amount to accrue an interest of 30% per month and that the collection all the fees and costs that Delswiz Management Consultant (Pty) Ltd, may incur in collection of my balance owed as well as a competitive interest rate to be added to the total amount owed.\n"
     };
 
     function addListeners() {
@@ -599,7 +658,15 @@ myApp.component('eSignCmp', {
         e = e || window.event;
         var target = e.target || e.srcElement,
             text = target.textContent || target.innerText;
-        console.log(target); console.log(text);
+        // console.log(target); console.log(text);
+        // var caretPosition = document.caretPositionFromPoint(e.target.offsetLeft, e.target.offsetTop);
+        // console.log(caretPosition);
+        console.log(document.elementFromPoint(e.target.offsetLeft, e.target.offsetTop));
+        console.log(document.elementFromPoint(e.offsetX, e.offsetY));
+        console.log(document.elementFromPoint(e.clientX, e.clientY));
+        console.log(document.elementFromPoint(e.x, e.y));
+        console.log(e.target);
+
       }, false);
     }
 
